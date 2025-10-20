@@ -211,6 +211,13 @@ git merge develop
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
+## 👥 Equipe
+
+- **Arthur Sousa Furtado**
+- **Pedro Manoel Gaspar Aguiar**
+- **Carlos Antonio dos Santos Junior**
+- **Alisson Daniel Costa Nunes**
+
 ## 👥 Contribuição
 
 1. Faça um fork do projeto
