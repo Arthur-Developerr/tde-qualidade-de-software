@@ -1,7 +1,13 @@
 from flask import Blueprint, request, jsonify
 from app.models import db, User
 from sqlalchemy import text
-from app.service import list_users as all_users, create_user_service, update_user_service, delete_user_service
+from app.service import (
+    list_users as all_users, 
+    create_user_service, 
+    update_user_service, 
+    delete_user_service,
+    get_usd_brl_rate
+)
 
 urls = Blueprint('url', __name__)
 
@@ -40,5 +46,10 @@ def delete_user(user_id):
     return jsonify(result), status_code
 
 
+# Rota de Conversão de Moedas
 
+@urls.get("/api/exchange/usd-to-brl")
+def get_usd_to_brl():
+    result, status_code = get_usd_brl_rate()
+    return jsonify(result), status_code
 
