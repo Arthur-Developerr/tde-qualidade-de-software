@@ -1,2 +1,5 @@
 flask
 Flask-SQLAlchemy
+requests
+pytest
+pytest-cov

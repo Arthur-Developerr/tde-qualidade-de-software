@@ -1,14 +1,31 @@
-# API Flask - Gerenciamento de Usuários
+# API Flask - Gerenciamento de Usuários e Cotação USD-BRL
 
-Uma API REST simples desenvolvida em Flask para gerenciamento de usuários com operações CRUD completas.
+Uma API REST desenvolvida em Flask com funcionalidades de gerenciamento de usuários e consulta de cotação do dólar.
+
+## ⚡ Início Rápido
+
+```bash
+# 1. Instale as dependências
+pip install -r requirements.txt
+
+# 2. Execute a aplicação
+flask --app app.app run
+
+# 3. Teste os endpoints
+# Usuários
+curl http://localhost:5000/api/users
+
+# Cotação USD-BRL
+curl http://localhost:5000/api/exchange/usd-to-brl
+```
 
 ## 📋 Status do Projeto
 
 - ✅ **Estrutura inicial**: Configuração do Flask e SQLAlchemy
 - ✅ **Modelo de dados**: Entidade User com campos id, name e email
-- ✅ **Endpoints CRUD**: Implementação completa dos endpoints
+- ✅ **Endpoints CRUD**: Implementação completa dos endpoints de usuários
 - ✅ **Banco de dados**: SQLite configurado e funcional
-- 🔄 **Em desenvolvimento**: Testes automatizados e documentação da API
+- ✅ **Cotação USD-BRL**: Integração com AwesomeAPI para cotação em tempo real
 
 ## 🚀 Instruções de Execução
 
@@ -65,6 +82,8 @@ http://localhost:5000/api
 
 ### Endpoints Disponíveis
 
+#### 👤 Gerenciamento de Usuários
+
 | Método | Endpoint | Descrição | Status |
 |--------|----------|-----------|--------|
 | `GET` | `/api` | Mensagem de boas-vindas | ✅ |
@@ -73,31 +92,65 @@ http://localhost:5000/api
 | `PUT` | `/api/users/{id}` | Atualiza um usuário existente | ✅ |
 | `DELETE` | `/api/users/{id}` | Remove um usuário | ✅ |
 
+#### 💱 Cotação de Moedas
+
+| Método | Endpoint | Descrição | Status |
+|--------|----------|-----------|--------|
+| `GET` | `/api/exchange/usd-to-brl` | Obtém cotação atual USD-BRL | ✅ |
+
 ### Exemplos de Uso
 
-#### 1. Listar todos os usuários
+#### 👤 Usuários
+
+**1. Listar todos os usuários**
 ```bash
 curl -X GET http://localhost:5000/api/users
 ```
 
-#### 2. Criar um novo usuário
+**2. Criar um novo usuário**
 ```bash
 curl -X POST http://localhost:5000/api/users \
   -H "Content-Type: application/json" \
   -d '{"name": "João Silva", "email": "joao@email.com"}'
 ```
 
-#### 3. Atualizar um usuário
+**3. Atualizar um usuário**
 ```bash
 curl -X PUT http://localhost:5000/api/users/1 \
   -H "Content-Type: application/json" \
   -d '{"name": "João Santos", "email": "joao.santos@email.com"}'
 ```
 
-#### 4. Deletar um usuário
+**4. Deletar um usuário**
 ```bash
 curl -X DELETE http://localhost:5000/api/users/1
 ```
+
+#### 💱 Cotação USD-BRL
+
+**Obter cotação atual do Dólar**
+```bash
+curl http://localhost:5000/api/exchange/usd-to-brl
+```
+
+**Resposta:**
+```json
+{
+  "code": "USD",
+  "codein": "BRL",
+  "name": "Dólar Americano/Real Brasileiro",
+  "high": "5.4251",
+  "low": "5.37139",
+  "varBid": "-0.0035",
+  "pctChange": "-0.064791",
+  "bid": "5.3986",
+  "ask": "5.4016",
+  "timestamp": "1763990550",
+  "create_date": "2025-11-24 10:22:30"
+}
+```
+
+**API externa utilizada:** [https://economia.awesomeapi.com.br/json/last/USD-BRL](https://economia.awesomeapi.com.br/json/last/USD-BRL)
 
 ## 🗂️ Estrutura do Projeto
 
@@ -108,7 +161,12 @@ tde-qualidade-de-software/
 │   ├── app.py              # Configuração principal da aplicação
 │   ├── models.py           # Modelos de dados (User)
 │   ├── routes.py           # Definição das rotas/endpoints
-│   └── service.py          # Lógica de negócio
+│   └── service.py          # Lógica de negócio (Users + USD-BRL)
+├── tests/                  # ✨ NOVO: Testes unitários
+│   ├── __init__.py
+│   ├── test_exchange.py            # Testes com unittest
+│   ├── test_exchange_pytest.py     # Testes com pytest
+│   └── README.md                   # Documentação dos testes
 ├── instance/
 │   └── database.sqlite     # Banco de dados SQLite
 ├── requirements.txt        # Dependências do projeto
@@ -120,12 +178,18 @@ tde-qualidade-de-software/
 - **Flask**: Framework web Python
 - **SQLAlchemy**: ORM para banco de dados
 - **SQLite**: Banco de dados local
+- **Requests**: Biblioteca para requisições HTTP
+- **AwesomeAPI**: API externa para cotações de moedas
+- **Pytest**: Framework de testes
 - **Python**: Linguagem de programação
 
 ## 📦 Dependências
 
 - `flask`: Framework web
 - `Flask-SQLAlchemy`: Extensão do Flask para SQLAlchemy
+- `requests`: Biblioteca para requisições HTTP
+- `pytest`: Framework de testes
+- `pytest-cov`: Cobertura de testes
 
 ## 🔧 Comandos Git - Fluxo de Trabalho
 
@@ -205,7 +269,48 @@ git merge develop
 
 ## 🧪 Testes
 
-*Em desenvolvimento - testes automatizados serão implementados em breve*
+### Testes Unitários (com Mocks)
+
+Os testes unitários estão na pasta `/tests` e **não fazem chamadas reais** à API externa.
+
+```bash
+# Executar todos os testes (pytest)
+pytest tests/ -v
+
+# Executar com cobertura
+pytest tests/ --cov=app --cov-report=term-missing
+
+# Gerar relatório XML para SonarQube
+pytest --cov=app --cov-report=xml:coverage.xml tests/
+```
+
+**✅ Todos os testes usam `unittest.mock.patch` para simular a API externa**
+
+### 📊 Análise de Qualidade (SonarQube)
+
+O projeto está configurado para análise no SonarQube:
+
+```bash
+# 1. Gerar relatório de cobertura
+pytest --cov=app --cov-report=xml:coverage.xml tests/
+
+# 2. Executar análise do SonarQube
+sonar-scanner
+```
+
+**📖 Guia completo:** [SONARQUBE_SETUP.md](SONARQUBE_SETUP.md)
+
+### Teste Manual
+
+Para testar o endpoint manualmente com a API real:
+
+```bash
+# Iniciar a aplicação
+flask --app app.app run
+
+# Em outro terminal, testar o endpoint
+curl http://localhost:5000/api/exchange/usd-to-brl
+```
 
 ## 📝 Licença
 

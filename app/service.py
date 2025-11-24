@@ -1,5 +1,6 @@
 from app.models import db, User
 from sqlalchemy import text
+import requests
 
 
 
@@ -99,4 +100,41 @@ def delete_user_service(user_id):
     return {
         "message": "User deleted successfully"
     }, 200
+
+
+def get_usd_brl_rate():
+    try:
+        url = "https://economia.awesomeapi.com.br/json/last/USD-BRL"
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code != 200:
+            return {"error": "Não foi possível obter a cotação"}, response.status_code
+        
+        data = response.json()
+        
+        if "USDBRL" not in data:
+            return {"error": "Dados não encontrados"}, 404
+        
+        exchange_data = data["USDBRL"]
+        
+        return {
+            "code": exchange_data["code"],
+            "codein": exchange_data["codein"],
+            "name": exchange_data["name"],
+            "high": exchange_data["high"],
+            "low": exchange_data["low"],
+            "varBid": exchange_data["varBid"],
+            "pctChange": exchange_data["pctChange"],
+            "bid": exchange_data["bid"],
+            "ask": exchange_data["ask"],
+            "timestamp": exchange_data["timestamp"],
+            "create_date": exchange_data["create_date"]
+        }, 200
+        
+    except requests.exceptions.Timeout:
+        return {"error": "Timeout ao conectar com a API"}, 504
+    except requests.exceptions.RequestException as e:
+        return {"error": f"Erro ao conectar com a API: {str(e)}"}, 503
+    except Exception as e:
+        return {"error": f"Erro interno: {str(e)}"}, 500
 
