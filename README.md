@@ -278,13 +278,27 @@ Os testes unitários estão na pasta `/tests` e **não fazem chamadas reais** à
 pytest tests/ -v
 
 # Executar com cobertura
-pytest tests/ --cov=app
+pytest tests/ --cov=app --cov-report=term-missing
 
-# Executar testes unittest
-python -m unittest tests/test_exchange.py -v
+# Gerar relatório XML para SonarQube
+pytest --cov=app --cov-report=xml:coverage.xml tests/
 ```
 
 **✅ Todos os testes usam `unittest.mock.patch` para simular a API externa**
+
+### 📊 Análise de Qualidade (SonarQube)
+
+O projeto está configurado para análise no SonarQube:
+
+```bash
+# 1. Gerar relatório de cobertura
+pytest --cov=app --cov-report=xml:coverage.xml tests/
+
+# 2. Executar análise do SonarQube
+sonar-scanner
+```
+
+**📖 Guia completo:** [SONARQUBE_SETUP.md](SONARQUBE_SETUP.md)
 
 ### Teste Manual
 
